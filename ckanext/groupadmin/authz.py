@@ -5,19 +5,10 @@ GroupAdmins can manage all organizations/groups, but have no other sysadmin
 powers.
 '''
 from ckan import authz, model
-from ckan.common import OrderedDict
 from ckan.plugins import toolkit
 from ckanext.groupadmin.model import GroupAdmin
 
-import logging
-log = logging.getLogger(__name__)
-
-
-old_auth_roles = authz.ROLE_PERMISSIONS
-
 authz.ROLE_PERMISSIONS.update({'group_admin': ['read', 'manage_group']})
-
-log.info(authz.ROLE_PERMISSIONS)
 
 
 def _trans_role_group_admin():
