@@ -1,8 +1,16 @@
 from ckan import model
 from ckan.logic import validate
 from ckan.plugins import toolkit
+from ckan.logic.action.get import \
+    group_list_authz as core_group_list_authz
+import ckan.authz as authz
+import ckan.lib.dictization.model_dictize as model_dictize
+
 from ckanext.groupadmin.logic import schema
 from ckanext.groupadmin.model import GroupAdmin
+
+import logging
+log = logging.getLogger(__name__)
 
 
 @validate(schema.group_admin_schema)
@@ -40,3 +48,26 @@ def group_admin_list(context, data_dict):
     user_ids = GroupAdmin.get_group_admin_ids(session)
     return [toolkit.get_action('user_show')(data_dict={'id': user_id})
             for user_id in user_ids]
+
+
+def group_list_authz(context, data_dict):
+    '''Return the list of groups that the user is authorized to edit. Replaces
+    the core authz method of the same name.'''
+
+    user = context['user']
+    model = context['model']
+
+    user_id = authz.get_user_id_for_username(user, allow_none=True)
+
+    if GroupAdmin.is_user_group_admin(model.Session, user_id):
+        q = model.Session.query(model.Group) \
+            .filter(model.Group.is_organization == False) \
+            .filter(model.Group.state == 'active')
+
+        groups = q.all()
+
+        group_list = model_dictize.group_list_dictize(groups, context)
+        return group_list
+    else:
+        # defer to core method
+        return core_group_list_authz(context, data_dict)

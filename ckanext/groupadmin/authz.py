@@ -1,4 +1,4 @@
-'''This module monkey patches functions in ckan/authz.py and replaces the
+'''This module monkey patches functions in ckan/authz.py and updates the
 default roles with custom roles and decorates
 has_user_permission_for_group_org_org to allow a GroupAdmin to admin groups.
 GroupAdmins can manage all organizations/groups, but have no other sysadmin
