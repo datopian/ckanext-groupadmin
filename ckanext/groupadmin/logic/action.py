@@ -59,6 +59,8 @@ def group_list_authz(context, data_dict):
 
     user_id = authz.get_user_id_for_username(user, allow_none=True)
 
+    toolkit.check_access('group_list_authz', context, data_dict)
+
     if GroupAdmin.is_user_group_admin(model.Session, user_id):
         q = model.Session.query(model.Group) \
             .filter(model.Group.is_organization == False) \
