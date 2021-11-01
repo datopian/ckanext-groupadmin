@@ -60,4 +60,4 @@ class GroupAdminPlugin(plugins.SingletonPlugin):
         for rule in rules:
            groupController_blueprint.add_url_rule(*rule)
 
-        return groupController_blueprint
+        return [groupController_blueprint]
