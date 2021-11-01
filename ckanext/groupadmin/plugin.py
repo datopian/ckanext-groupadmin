@@ -3,6 +3,9 @@ from ckan.config.routing import SubMapper
 from ckan.plugins import toolkit
 from ckanext.groupadmin.logic import action, auth
 from ckanext.groupadmin import model
+from flask import Blueprint
+from ckanext.groupadmin.controller import manage, remove
+
 
 
 class GroupAdminPlugin(plugins.SingletonPlugin):
@@ -10,7 +13,7 @@ class GroupAdminPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IAuthFunctions)
     plugins.implements(plugins.IConfigurable)
     plugins.implements(plugins.IConfigurer)
-    plugins.implements(plugins.IRoutes, inherit=True)
+    plugins.implements(plugins.IBlueprint)
 
     # IActions
     def get_actions(self):
@@ -35,13 +38,26 @@ class GroupAdminPlugin(plugins.SingletonPlugin):
     def configure(self, config):
         model.setup()
 
-    # IRoutes
-    def before_map(self, map):
-        controller = 'ckanext.groupadmin.controller:GroupAdminController'
-        with SubMapper(map, controller=controller) as m:
-            m.connect('group_admins', '/ckan-admin/group_admins',
-                      action='manage', ckan_icon='user')
-            m.connect('group_admin_remove',
-                      '/ckan-admin/group_admin_remove',
-                      action='remove')
-        return map
+    # # IRoutes
+    # def before_map(self, map):
+    #     controller = 'ckanext.groupadmin.controller:GroupAdminController'
+    #     with SubMapper(map, controller=controller) as m:
+    #         m.connect('group_admins', '/ckan-admin/group_admins',
+    #                   action='manage', ckan_icon='user')
+    #         m.connect('group_admin_remove',
+    #                   '/ckan-admin/group_admin_remove',
+    #                   action='remove')
+    #     return map
+
+
+    #IBlueprints
+    def get_blueprints(self):
+        groupController_blueprint = Blueprint('group_controller', self.__module__)
+        rules = [
+            ('/ckan-admin/group_admins', 'group_admins', manage,[u'GET',u'POST']),
+            ('/ckan-admin/group_admin_remove', 'group_admin_remove', remove, [u'GET',u'POST']),
+        ]
+        for rule in rules:
+           groupController_blueprint.add_url_rule(*rule)
+
+        return groupController_blueprint
