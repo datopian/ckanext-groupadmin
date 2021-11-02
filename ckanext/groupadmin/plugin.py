@@ -53,11 +53,16 @@ class GroupAdminPlugin(plugins.SingletonPlugin):
     #IBlueprints
     def get_blueprints(self):
         groupController_blueprint = Blueprint('group_controller', self.__module__)
-        rules = [
-            ('/ckan-admin/group_admins', 'group_admins', manage,[u'GET',u'POST']),
-            ('/ckan-admin/group_admin_remove', 'group_admin_remove', remove, [u'GET',u'POST']),
-        ]
-        for rule in rules:
-           groupController_blueprint.add_url_rule(*rule)
+        
+        groupController_blueprint.add_url_rule(
+            rule='/ckan-admin/group_admins',
+            view_func=manage,
+            methods=[u'GET', u'POST'],
+        )
+        groupController_blueprint.add_url_rule(
+            rule='/ckan-admin/group_admin_remove',
+            view_func=remove,
+            methods=[u'GET', u'POST'],
+        )
 
         return [groupController_blueprint]

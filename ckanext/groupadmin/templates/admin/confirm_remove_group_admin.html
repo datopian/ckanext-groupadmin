@@ -10,7 +10,7 @@
       {% block form %}
         <p>{{ _('Are you sure you want to remove this user as a Group Admin - {name}?').format(name=user_dict.name) }}</p>
         <p class="form-actions">
-          <form action="{% url_for 'group_admin_remove' %}" method="post">
+          <form action="{% url_for 'group_controller.remove' %}" method="post">
             <input type="hidden" name="user" value="{{ user_dict.id }}" />
             <button class="btn" type="submit" name="cancel" >{{ _('Cancel') }}</button>
             <button class="btn btn-primary" type="submit" name="delete" >{{ _('Confirm Remove') }}</button>
