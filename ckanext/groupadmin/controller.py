@@ -1,8 +1,9 @@
 from ckan import model
 from ckan.lib import helpers
 from ckan.plugins import toolkit
+from flask import Blueprint
 
-
+groupadmin = Blueprint(u'groupadmin_blueprint', __name__)
 
 def manage():
     context = {'model': model, 'session': model.Session,
@@ -12,7 +13,7 @@ def manage():
     except toolkit.NotAuthorized:
         toolkit.abort(401, toolkit._('User not authorized to view page'))
 
-    controller = 'group_controller'
+    controller = 'groupadmin_blueprint'
     username = toolkit.request.params.get('username')
     if toolkit.request.method == 'POST' and username:
         try:
@@ -46,7 +47,7 @@ def remove():
     context = {'model': model, 'session': model.Session,
                 'user': toolkit.c.user or toolkit.c.author}
 
-    controller = 'group_controller'
+    controller = 'groupadmin_blueprint'
     try:
         toolkit.check_access('sysadmin', context, {})
     except toolkit.NotAuthorized:
@@ -81,3 +82,15 @@ def remove():
             'user_dict': user_dict,
         }
     )
+
+groupadmin.add_url_rule('/ckan-admin/group_admins',
+    view_func=manage,
+    methods=[u'GET', u'POST'],
+)
+groupadmin.add_url_rule('/ckan-admin/group_admin_remove',
+    view_func=remove,
+    methods=[u'GET', u'POST'],
+)
+
+def get_blueprints():
+    return [groupadmin]

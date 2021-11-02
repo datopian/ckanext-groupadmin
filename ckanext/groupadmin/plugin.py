@@ -3,17 +3,20 @@ from ckan.config.routing import SubMapper
 from ckan.plugins import toolkit
 from ckanext.groupadmin.logic import action, auth
 from ckanext.groupadmin import model
-from flask import Blueprint
-from ckanext.groupadmin.controller import manage, remove
+import ckanext.groupadmin.controller as views
 
 
 
 class GroupAdminPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IActions)
+    plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IAuthFunctions)
     plugins.implements(plugins.IConfigurable)
     plugins.implements(plugins.IConfigurer)
-    plugins.implements(plugins.IBlueprint)
+   
+
+    def get_blueprint(self):
+        return views.get_blueprints()
 
     # IActions
     def get_actions(self):
@@ -32,7 +35,7 @@ class GroupAdminPlugin(plugins.SingletonPlugin):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_resource('fanstatic', 'groupadmin')
-        toolkit.add_ckan_admin_tab(config_, 'group_admins', 'Group Admins')
+        toolkit.add_ckan_admin_tab(config_, 'groupadmin_blueprint.manage', 'Group Admins')
 
     # IConfigurable
     def configure(self, config):
@@ -50,19 +53,3 @@ class GroupAdminPlugin(plugins.SingletonPlugin):
     #     return map
 
 
-    #IBlueprints
-    def get_blueprints(self):
-        groupController_blueprint = Blueprint('group_controller', self.__module__)
-        
-        groupController_blueprint.add_url_rule(
-            rule='/ckan-admin/group_admins',
-            view_func=manage,
-            methods=[u'GET', u'POST'],
-        )
-        groupController_blueprint.add_url_rule(
-            rule='/ckan-admin/group_admin_remove',
-            view_func=remove,
-            methods=[u'GET', u'POST'],
-        )
-
-        return [groupController_blueprint]
